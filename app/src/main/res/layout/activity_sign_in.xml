@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignInActivity"
+    android:orientation="vertical">
+
+    <ImageView
+        android:src="@drawable/baseline_chat_24"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"/>
+    
+    <EditText
+        android:id="@+id/emailEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Your email"
+        android:inputType="textEmailAddress"/>
+
+    <EditText
+        android:id="@+id/nameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Your name"
+        android:inputType="textPersonName"/>
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Your password"
+        android:inputType="textPassword"/>
+    <EditText
+        android:id="@+id/passwordEditText2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Confirm password"
+        android:inputType="textPassword"/>
+
+    <Button
+        android:id="@+id/loginSignUpButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="Sign up"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/toggleLoginTextView"
+        android:text="Tap to Log in"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:onClick="toggleLogIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

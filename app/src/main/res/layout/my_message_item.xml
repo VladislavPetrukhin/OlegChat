@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:paddingTop="10dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/rounded_background_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/photoImageView"
+            android:outlineProvider="background"
+            android:background="@drawable/rounded_corners"
+            android:clipToOutline="true"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/messageTextView"
+            android:maxWidth="300dp"
+            android:padding="10dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        
+    </LinearLayout>
+
+</RelativeLayout>

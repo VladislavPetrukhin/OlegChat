@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "706039703760",
+    "firebase_url": "https://olegchat-fae61-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "olegchat-fae61",
+    "storage_bucket": "olegchat-fae61.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706039703760:android:8181791742072012e596d5",
+        "android_client_info": {
+          "package_name": "com.oleg.olegchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "706039703760-2vgt20gpcq7soqsr7soosbf3jhcncvf6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oleg.olegchat",
+            "certificate_hash": "6db992efe4e0b84c0c23782b2f18e7a398545956"
+          }
+        },
+        {
+          "client_id": "706039703760-he8h7mvbm8vpoj51ogsoclrk99u5a6s2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXhVx2LK0h_FqjuF7MsN6G5_LCms_nSCc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "706039703760-he8h7mvbm8vpoj51ogsoclrk99u5a6s2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

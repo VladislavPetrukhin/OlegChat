@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:paddingTop="100dp"
+    tools:context=".ProfileActivity">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profileImageView"
+        android:layout_gravity="center"
+        android:background="@drawable/profile_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+    <EditText
+        android:id="@+id/profileNameEditText"
+        android:layout_gravity="center"
+        android:text="Profile Name"
+        android:textSize="30sp"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/doneEditNameButton"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:paddingLeft="20dp"
+            android:background="@drawable/baseline_done_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+    <TextView
+        android:text="My ID:"
+        android:layout_gravity="center"
+        android:paddingTop="30dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/profileIdTextView"
+        android:text="888888888"
+        android:clickable="true"
+        android:layout_gravity="center"
+        android:paddingTop="20dp"
+        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="You can click on your ID to copy it and share with your friends"
+        android:layout_gravity="center"
+        android:paddingTop="20sp"
+        android:layout_width="wrap_content"
+        android:maxWidth="250dp"
+        android:textAlignment="center"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/logOutProfileTextView"
+        android:text="Log out"
+        android:clickable="true"
+        android:textColor="#F40707"
+        android:paddingTop="40dp"
+        android:textSize="18sp"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
