@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -33,13 +35,17 @@ public class UserListActivity extends AppCompatActivity {
     private DatabaseReference usersDatabaseReference;
     private ChildEventListener usersChildEventListener;
 
+    private String TAG = "UserListActivityLog";
+
     private FirebaseAuth auth;
     private User currentUser;
     private String username = "Default User";
     private ArrayList<User> userArrayList;
+    public static String[] contacts = {};
     private RecyclerView userRecyclerView;
     public static UserAdapter userAdapter;
     private RecyclerView.LayoutManager userLayoutManager;
+    private FloatingActionButton floatingActionButton;
 
     public static ArrayList<Integer> unreadDialogsPosition = new ArrayList<>();
 
@@ -54,9 +60,10 @@ public class UserListActivity extends AppCompatActivity {
         setTitle("My Contacts");
         auth = FirebaseAuth.getInstance();
         userArrayList = new ArrayList<>();
+        //sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
+      //  editor = sharedPreferences.edit();
 
-        sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        floatingActionButton = findViewById(R.id.floatingActionButton);
 
         try {
             username = Objects.requireNonNull(auth.getCurrentUser()).getDisplayName();
@@ -64,12 +71,37 @@ public class UserListActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-
         //   Log.d("currentUserLog",SignInActivity.currentUser.getId());
 
         attachUserDatabaseReferenceListener();
-        checkUnreadMessages();
+
+//        boolean contain;
+//        for (User user : userArrayList){
+//            contain = false;
+//            for (String contact : contacts) {
+//                if (user.getId().equals(contact)){
+//                    contain = true;
+//                }
+//            }
+//            if (!contain){
+//                userArrayList.remove(user);
+//            }
+//        }
+//        userAdapter.notifyDataSetChanged();
+
+       // checkUnreadMessages();
         buildRecyclerView();
+
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserListActivity.this, FindUsersActivity.class);
+                intent.putExtra("userName",username);
+                intent.putExtra("userId",auth.getCurrentUser().getUid());
+                startActivity(intent);
+            }
+        });
     }
 
     private void attachUserDatabaseReferenceListener() {
@@ -80,12 +112,10 @@ public class UserListActivity extends AppCompatActivity {
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     User user = snapshot.getValue(User.class);
                     if(!user.getId().equals(auth.getCurrentUser().getUid())){
-                        //user.setAvatarMockUpResource(R.drawable.baseline_photo_camera_50);
-                        userArrayList.add(user);
-//                        account.setName(user.getName());
-//                        account.setPhotoUrl(user.getPhotoUrl());
-//                        account.setId(user.getId());
-                        userAdapter.notifyDataSetChanged();
+                                userArrayList.add(user);
+                                userAdapter.notifyDataSetChanged();
+                    }else{
+                      //  contacts = user.getContacts();
                     }
                 }
 

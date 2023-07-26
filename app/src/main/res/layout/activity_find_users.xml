@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".FindUsersActivity">
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/searchUserEditText"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:hint="Enter user id"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:minWidth="200dp"
+        android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/searchUserImageButton"
+            android:layout_gravity="center"
+            android:layout_marginLeft="15dp"
+            android:background="@drawable/baseline_search_24"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/foundedTextView"
+        android:clickable="true"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
