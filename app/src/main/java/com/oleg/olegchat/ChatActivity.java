@@ -362,6 +362,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        progressBar.setVisibility(ProgressBar.VISIBLE);
         if(requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
             Uri selectedImageUri = data.getData();
             final StorageReference imageReference = chatImagesStorageReference.
@@ -394,6 +395,7 @@ public class ChatActivity extends AppCompatActivity {
                         message.setSender(auth.getCurrentUser().getUid());
                         message.setRecipient(recipientUserId);
                         messagesDatabaseReference.push().setValue(message);
+                        progressBar.setVisibility(ProgressBar.INVISIBLE);
                     } else {
                         // Handle failures
                         // ...
