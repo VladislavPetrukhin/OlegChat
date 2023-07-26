@@ -161,19 +161,29 @@ public class SignInActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "createUserWithEmail:success");
+                                Log.d(TAG,name);
                                 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                         .setDisplayName(name)
                                         .build();
                                 FirebaseUser user = auth.getCurrentUser();
-                                user.updateProfile(profileUpdates)
-                                        .addOnCompleteListener(task1 -> {
-                                            if (task1.isSuccessful()) {
-                                                createUser(user);
-                                                Log.d(TAG, "User profile updated.");
-                                            }
-                                        });
-
-                                startActivity(new Intent(SignInActivity.this, UserListActivity.class));
+                                if(user != null){
+                                    Log.d(TAG,user.getUid().toString());
+                                    user.updateProfile(profileUpdates)
+                                            .addOnCompleteListener(task1 -> {
+                                                if (task1.isSuccessful()) {
+                                                    Log.d(TAG, "User profile updated.");
+                                                    createUser(user);
+                                                }else{
+                                                    Log.d(TAG, "User profile update failed");
+                                                    createUser(user);
+                                                }
+                                            });
+                                    //createUser(user);
+                                    startActivity(new Intent(SignInActivity.this, UserListActivity.class));
+                                }
+                                else{
+                                    Log.e(TAG,"user = null");
+                                }
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -208,6 +218,7 @@ public class SignInActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).child("id").setValue(firebaseUser.getUid());
         FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).child("email").setValue(firebaseUser.getEmail());
+        Log.d(TAG,"firabaseuser name: "+firebaseUser.getDisplayName());
         FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).child("name").setValue(firebaseUser.getDisplayName());
         FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).child("photoUrl").setValue("");
         FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid()).child("contacts").setValue("");

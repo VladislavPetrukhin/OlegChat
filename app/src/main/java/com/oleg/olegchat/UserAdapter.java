@@ -50,7 +50,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.userNameTextView.setText(currentUser.getName());
         Glide.with(holder.avatarImageView.getContext())
                 .load(currentUser.getPhotoUrl()).into(holder.avatarImageView);
-        Log.d("UserAdapterLogs",currentUser.getName());
+       // Log.d("UserAdapterLogs",currentUser.getName());
         if (UserListActivity.unreadDialogsPosition != null && UserListActivity.unreadDialogsPosition.contains(position)){
             holder.unreadDialogNotify.setVisibility(View.VISIBLE);
         }else{

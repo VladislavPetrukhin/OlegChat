@@ -2,27 +2,36 @@ package com.oleg.olegchat;
 
 public class AwesomeMessage {
 
+    private String messageType;
     private String text;
     private String name;
-    private String imageUrl;
+    private String url;
     private String sender;
     private String recipient;
     private String message_id;
     private boolean isMine;
-
     public AwesomeMessage(){
 
     }
 
-    public AwesomeMessage(String text, String name, String imageUrl, String sender,
+    public AwesomeMessage(String messageType, String text, String name, String url, String sender,
                           String recipient, String message_id, boolean isMine) {
+        this.messageType = messageType;
         this.text = text;
         this.name = name;
-        this.imageUrl = imageUrl;
+        this.url = url;
         this.sender = sender;
         this.recipient = recipient;
         this.message_id = message_id;
         this.isMine = isMine;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 
     public String getText() {
@@ -41,12 +50,12 @@ public class AwesomeMessage {
         this.name = name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getSender() {

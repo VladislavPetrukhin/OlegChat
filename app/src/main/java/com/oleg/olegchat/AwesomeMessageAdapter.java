@@ -58,17 +58,36 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         }
-        boolean isText = awesomeMessage.getImageUrl() == null;
-        if (isText){
-            viewHolder.messageTextView.setVisibility(View.VISIBLE);
-            viewHolder.photoImageView.setVisibility(View.GONE);
-            viewHolder.messageTextView.setText(awesomeMessage.getText());
-        }else{
-            viewHolder.messageTextView.setVisibility(View.GONE);
-            viewHolder.photoImageView.setVisibility(View.VISIBLE);
-            Glide.with(viewHolder.photoImageView.getContext())
-                    .load(awesomeMessage.getImageUrl()).into(viewHolder.photoImageView);
+        switch (awesomeMessage.getMessageType()){
+            case "text":{
+                viewHolder.messageTextView.setVisibility(View.VISIBLE);
+                viewHolder.photoImageView.setVisibility(View.GONE);
+                viewHolder.messageTextView.setText(awesomeMessage.getText());
+                break;
+            }
+            case "image":{
+                viewHolder.messageTextView.setVisibility(View.GONE);
+                viewHolder.photoImageView.setVisibility(View.VISIBLE);
+                Glide.with(viewHolder.photoImageView.getContext())
+                        .load(awesomeMessage.getUrl()).into(viewHolder.photoImageView);
+                break;
+            }
+            case "audio":{ // TODO
+                break;
+            }
+            case "video":{// TODO
+                break;
+            }
+            case "voice":{// TODO
+                break;
+            }
+            default:{
+                viewHolder.messageTextView.setVisibility(View.VISIBLE);
+                viewHolder.photoImageView.setVisibility(View.GONE);
+                viewHolder.messageTextView.setText(awesomeMessage.getText());
+            }
         }
+
         viewHolder.photoImageView.setClipToOutline(true);
         //nameTextView.setText(message.getName());
 
@@ -76,7 +95,7 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
-                intent.putExtra("image_resource", awesomeMessage.getImageUrl());
+                intent.putExtra("image_resource", awesomeMessage.getUrl());
                 intent.putExtra("message_id",awesomeMessage.getMessage_id());
                 context.startActivity(intent);
             }

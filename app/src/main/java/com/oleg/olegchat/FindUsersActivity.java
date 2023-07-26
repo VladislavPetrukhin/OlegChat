@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -27,6 +29,7 @@ public class FindUsersActivity extends AppCompatActivity {
     EditText searchUserEditText;
     ImageButton searchUserImageButton;
     TextView foundedTextView;
+    Button addContactButton;
     private ArrayList<User> userArrayList;
     private String username;
     private String userId;
@@ -46,12 +49,16 @@ public class FindUsersActivity extends AppCompatActivity {
         Intent intent = getIntent();
         username = intent.getStringExtra("userName");
         userId = intent.getStringExtra("userId");
+        userArrayList = new ArrayList<>();
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
         searchUserEditText = findViewById(R.id.searchUserEditText);
         searchUserImageButton = findViewById(R.id.searchUserImageButton);
         foundedTextView = findViewById(R.id.foundedTextView);
+        addContactButton = findViewById(R.id.addContactButton);
+
+        attachUserDatabaseReferenceListener();
 
         searchUserEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,19 +78,22 @@ public class FindUsersActivity extends AppCompatActivity {
                     Log.d(TAG,"user: " + user.getName() + " " + user.getId());
                     if(searchUser.equals(user.getId()) || searchUser.equals(user.getName())){
                         foundedTextView.setVisibility(View.VISIBLE);
+                        addContactButton.setVisibility(View.VISIBLE);
                         searchUser = user.getName();
                         searchUserId = user.getId();
-                        foundedTextView.setText("Founded " + searchUser + "\n with id: " + searchUserId);
+                        String string = "Founded " + searchUser + "\n with id: " + searchUserId;
+                        foundedTextView.setText(string);
                         break;
                     }else{
                         foundedTextView.setVisibility(View.VISIBLE);
+                        addContactButton.setVisibility(View.GONE);
                         foundedTextView.setText("Not founded");
                     }
                 }
             }
         });
 
-        foundedTextView.setOnClickListener(new View.OnClickListener() {
+        addContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addUserContact(searchUserId);
@@ -97,13 +107,45 @@ public class FindUsersActivity extends AppCompatActivity {
     private void addUserContact(String addUserId){
         try {
             DatabaseReference userRef = FirebaseDatabase.getInstance()
-                    .getReference("users").child(userId);
-            userRef.child("contacts").child(addUserId).setValue(addUserId);
+                    .getReference("users").child(userId).child("contacts");
+
+            userRef.addListenerForSingleValueEvent
+                    (new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            // Получение значения ветви из снимка (DataSnapshot)
+                            String contacts = dataSnapshot.getValue(String.class);
+                            Log.d(TAG, "contacts: " + contacts);
+                            if(contacts != null){
+                                String[] splitContacts = contacts.split(":");
+                                for(String contact : splitContacts){
+                                    if (contact.equals(addUserId)){
+                                        Toast.makeText(FindUsersActivity.this, "The user is already in your contacts",
+                                                Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                }
+                                contacts = contacts + ":" + addUserId;
+                            }
+                            else{
+                                contacts = addUserId;
+                            }
+                            userRef.removeValue();
+                            userRef.setValue(contacts);
+                            Toast.makeText(FindUsersActivity.this, "The user added to your contacts",
+                                    Toast.LENGTH_SHORT).show();
+
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Обработка ошибок при чтении данных
+                            Toast.makeText(FindUsersActivity.this, "The user wasn't added to your contacts",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
           //  UserListActivity.userArrayList.add();
 
-            Toast.makeText(FindUsersActivity.this, "The user added to your contacts",
-                    Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(FindUsersActivity.this, "The user wasn't added to your contacts",
                     Toast.LENGTH_SHORT).show();
@@ -119,7 +161,8 @@ public class FindUsersActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     User user = snapshot.getValue(User.class);
-                    if(!user.getId().equals(userId)){
+                    Log.d(TAG,"userid: " + userId);
+                    if(user!=null && !user.getId().equals(userId)){
 
                         userArrayList.add(user);
                     }

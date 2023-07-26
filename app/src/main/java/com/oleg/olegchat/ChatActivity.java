@@ -48,7 +48,7 @@ public class ChatActivity extends AppCompatActivity {
     private ListView messageListView;
     private AwesomeMessageAdapter adapter;
     private ProgressBar progressBar;
-    private ImageButton sendFilesButton, imageAttachButton, audioAttachButton, documentAttachButton,sendMessageButton;
+    private ImageButton sendFilesButton, imageAttachButton, videoAttachButton, audioAttachButton, documentAttachButton,sendMessageButton;
     private EditText messageEditText;
     private LinearLayout attachLinearLayout;
     private boolean isVisibleAttachLinearLayout;
@@ -115,6 +115,7 @@ public class ChatActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         sendFilesButton = findViewById(R.id.sendFilesButton);
         imageAttachButton = findViewById(R.id.imageAttachButton);
+        videoAttachButton = findViewById(R.id.videoAttachButton);
         audioAttachButton = findViewById(R.id.audioAttachButton);
         documentAttachButton = findViewById(R.id.documentAttachButton);
         sendMessageButton = findViewById(R.id.sendMessageButton);
@@ -154,12 +155,13 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 AwesomeMessage message = new AwesomeMessage();
+                message.setMessageType("text");
                 message.setMessage_id(UUID.randomUUID().toString());
                 message.setText(messageEditText.getText().toString());
                 message.setName(username);
                 message.setSender(auth.getCurrentUser().getUid());
                 message.setRecipient(recipientUserId);
-                message.setImageUrl(null);
+                message.setUrl(null);
                 messagesDatabaseReference.push().setValue(message);
 
                 messageEditText.setText("");
@@ -183,11 +185,27 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                String[] mimeTypes = {"image/*","video/*"};
-                intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+//                intent.setType("*/*");
+//                String[] mimeTypes = {"image/*","video/*"};
+//                intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+                intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-                startActivityForResult(Intent.createChooser(intent,"Choose an image/video"),
+            //    startActivityForResult(Intent.createChooser(intent,"Choose an image/video"),
+                 //       RC_IMAGE_PICKER);
+                startActivityForResult(Intent.createChooser(intent,"Choose an image"),
+                        RC_IMAGE_PICKER);
+                attachLinearLayout.animate().alpha(0).setDuration(1000);
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                isVisibleAttachLinearLayout = false;
+            }
+        });
+        videoAttachButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("video/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(Intent.createChooser(intent,"Choose an video"),
                         RC_IMAGE_PICKER);
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
                 sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
@@ -369,8 +387,9 @@ public class ChatActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         AwesomeMessage message = new AwesomeMessage();
+                        message.setMessageType("image");
                         message.setMessage_id(UUID.randomUUID().toString());
-                        message.setImageUrl(downloadUri.toString());
+                        message.setUrl(downloadUri.toString());
                         message.setName(username);
                         message.setSender(auth.getCurrentUser().getUid());
                         message.setRecipient(recipientUserId);

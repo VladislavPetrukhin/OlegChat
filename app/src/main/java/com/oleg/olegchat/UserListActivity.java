@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -33,15 +35,15 @@ public class UserListActivity extends AppCompatActivity {
 
 
     private DatabaseReference usersDatabaseReference;
+    private DatabaseReference databaseReference;
     private ChildEventListener usersChildEventListener;
 
     private String TAG = "UserListActivityLog";
 
     private FirebaseAuth auth;
-    private User currentUser;
     private String username = "Default User";
     private ArrayList<User> userArrayList;
-    public static String[] contacts = {};
+    private ArrayList<User> contactArrayList;
     private RecyclerView userRecyclerView;
     public static UserAdapter userAdapter;
     private RecyclerView.LayoutManager userLayoutManager;
@@ -52,6 +54,11 @@ public class UserListActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     SharedPreferences sharedPreferences;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        attachUserContacts();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +67,9 @@ public class UserListActivity extends AppCompatActivity {
         setTitle("My Contacts");
         auth = FirebaseAuth.getInstance();
         userArrayList = new ArrayList<>();
+        contactArrayList = new ArrayList<>();
         //sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
-      //  editor = sharedPreferences.edit();
+        //  editor = sharedPreferences.edit();
 
         floatingActionButton = findViewById(R.id.floatingActionButton);
 
@@ -73,7 +81,7 @@ public class UserListActivity extends AppCompatActivity {
 
         //   Log.d("currentUserLog",SignInActivity.currentUser.getId());
 
-        attachUserDatabaseReferenceListener();
+        //initAttachUserContacts();
 
 //        boolean contain;
 //        for (User user : userArrayList){
@@ -89,33 +97,79 @@ public class UserListActivity extends AppCompatActivity {
 //        }
 //        userAdapter.notifyDataSetChanged();
 
-       // checkUnreadMessages();
+        // checkUnreadMessages();
         buildRecyclerView();
-
+        attachUserDatabaseReferenceListener();
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(UserListActivity.this, FindUsersActivity.class);
-                intent.putExtra("userName",username);
-                intent.putExtra("userId",auth.getCurrentUser().getUid());
+                intent.putExtra("userName", username);
+                intent.putExtra("userId", auth.getCurrentUser().getUid());
                 startActivity(intent);
             }
         });
     }
 
     private void attachUserDatabaseReferenceListener() {
+        Log.d(TAG, "attachUserDatabaseReferenceListener");
         usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
-        if(usersChildEventListener == null){
+            userArrayList.clear();
             usersChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     User user = snapshot.getValue(User.class);
-                    if(!user.getId().equals(auth.getCurrentUser().getUid())){
-                                userArrayList.add(user);
-                                userAdapter.notifyDataSetChanged();
-                    }else{
-                      //  contacts = user.getContacts();
+                    if (!user.getId().equals(auth.getCurrentUser().getUid())) {
+                        userArrayList.add(user);
+                       // userAdapter.notifyDataSetChanged();
+                        attachUserContacts();
+                        userAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    User user = snapshot.getValue(User.class);
+                    if (!user.getId().equals(auth.getCurrentUser().getUid())) {
+                        userArrayList.add(user);
+                        // userAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+
+            usersDatabaseReference.addChildEventListener(usersChildEventListener);
+
+    }
+    private void initAttachUserDatabaseReferenceListener(String[] contacts) {
+        Log.d(TAG, "initAttachUserDatabaseReferenceListener");
+        usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        if (usersChildEventListener == null) {
+            usersChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    User user = snapshot.getValue(User.class);
+                    for(String contact : contacts){
+                        if (user.getId().equals(contact)){
+                            contactArrayList.add(user);
+                            Log.d(TAG,"added " + user.getId());
+                            userAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
 
@@ -144,6 +198,66 @@ public class UserListActivity extends AppCompatActivity {
 
         }
     }
+    private void attachUserContacts() {
+        Log.d(TAG, "attachUserContacts");
+        contactArrayList.clear();
+        databaseReference = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(auth.getCurrentUser().getUid())
+                .child("contacts");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Получение значения ветви из снимка (DataSnapshot)
+                String value = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "event");
+                if (value != null) {
+                    Log.d(TAG,"value not null");
+                    String[] contacts = value.split(":");
+                    Log.d(TAG,"contact1 "+contacts[0]);
+                    for(String contact : contacts){
+                        for(User user : userArrayList){
+                            Log.d(TAG,"user"+user.getId());
+                            Log.d(TAG,"contact"+contact);
+                            if(user.getId().equals(contact)){
+                                if(!contactArrayList.contains(user)){
+                                    contactArrayList.add(user);
+                                    userAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Обработка ошибок при чтении данных
+            }
+        });
+    }
+    private void initAttachUserContacts() {
+        Log.d(TAG, "initAttachUserContacts");
+        usersDatabaseReference = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(auth.getCurrentUser().getUid())
+                .child("contacts");
+        usersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Получение значения ветви из снимка (DataSnapshot)
+                String value = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "event");
+                if (value != null) {
+                    String[] contacts = value.split(":");
+                    initAttachUserDatabaseReferenceListener(contacts);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Обработка ошибок при чтении данных
+            }
+        });
+    }
 
     private void buildRecyclerView() {
         userRecyclerView = findViewById(R.id.userListRecycleView);
@@ -151,7 +265,7 @@ public class UserListActivity extends AppCompatActivity {
         userRecyclerView.addItemDecoration(new DividerItemDecoration(userRecyclerView.getContext(),
                 DividerItemDecoration.VERTICAL));
         userLayoutManager = new LinearLayoutManager(this);
-        userAdapter = new UserAdapter(userArrayList);
+        userAdapter = new UserAdapter(contactArrayList);
 
         userRecyclerView.setLayoutManager(userLayoutManager);
         userRecyclerView.setAdapter(userAdapter);
@@ -164,36 +278,36 @@ public class UserListActivity extends AppCompatActivity {
         });
     }
 
-    private void goToChat(int position){
+    private void goToChat(int position) {
         Intent intent = new Intent(UserListActivity.this, ChatActivity.class);
-        intent.putExtra("recipientUserId",userArrayList.get(position).getId());
-        intent.putExtra("recipientUserName",userArrayList.get(position).getName());
+        intent.putExtra("recipientUserId", userArrayList.get(position).getId());
+        intent.putExtra("recipientUserName", userArrayList.get(position).getName());
         startActivity(intent);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.userlistactivity_menu,menu);
+        inflater.inflate(R.menu.userlistactivity_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.accountButton:
                 startActivity(new Intent(UserListActivity.this, ProfileActivity.class));
                 return true;
             case R.id.log_out:
                 FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(UserListActivity.this,SignInActivity.class));
+                startActivity(new Intent(UserListActivity.this, SignInActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void checkUnreadMessages(){
+    private void checkUnreadMessages() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference messagesDatabaseReference = firebaseDatabase.getReference().child("messages");
 
@@ -203,21 +317,21 @@ public class UserListActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 AwesomeMessage message = snapshot.getValue(AwesomeMessage.class);
 
-                if(message.getRecipient().equals(auth.getCurrentUser().getUid())){
+                if (message.getRecipient().equals(auth.getCurrentUser().getUid())) {
 
-                    for (User user : userArrayList){
-                        if(user.getId().equals(message.getSender())){
+                    for (User user : userArrayList) {
+                        if (user.getId().equals(message.getSender())) {
                             String lastMessage_id = "";
                             int position = userArrayList.indexOf(user);
                             try {
-                                sharedPreferences.getString(user.getId(),lastMessage_id);
-                                Log.d("lastMessage_id","get: " + lastMessage_id);
+                                sharedPreferences.getString(user.getId(), lastMessage_id);
+                                Log.d("lastMessage_id", "get: " + lastMessage_id);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
-                            if(!message.getMessage_id().equals(lastMessage_id)){
+                            if (!message.getMessage_id().equals(lastMessage_id)) {
                                 unreadDialogsPosition.add(position);
-                            }else if(unreadDialogsPosition.contains(position)){
+                            } else if (unreadDialogsPosition.contains(position)) {
                                 try {
                                     unreadDialogsPosition.remove(unreadDialogsPosition.indexOf(position));
                                 } catch (Exception e) {
