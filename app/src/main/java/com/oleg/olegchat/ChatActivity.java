@@ -189,6 +189,9 @@ public class ChatActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                 startActivityForResult(Intent.createChooser(intent,"Choose an image/video"),
                         RC_IMAGE_PICKER);
+                attachLinearLayout.animate().alpha(0).setDuration(1000);
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                isVisibleAttachLinearLayout = false;
             }
         });
         audioAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -199,6 +202,9 @@ public class ChatActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                 startActivityForResult(Intent.createChooser(intent,"Choose an audio"),
                         RC_IMAGE_PICKER);
+                attachLinearLayout.animate().alpha(0).setDuration(1000);
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                isVisibleAttachLinearLayout = false;
             }
         });
         documentAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -215,6 +221,9 @@ public class ChatActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                 startActivityForResult(Intent.createChooser(intent,"Choose an document"),
                         RC_IMAGE_PICKER);
+                attachLinearLayout.animate().alpha(0).setDuration(1000);
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                isVisibleAttachLinearLayout = false;
             }
         });
 
