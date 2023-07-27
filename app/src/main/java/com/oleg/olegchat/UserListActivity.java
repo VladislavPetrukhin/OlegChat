@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +20,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,7 +50,7 @@ public class UserListActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private String username = "Default User";
     private ArrayList<User> userArrayList;
-    private ArrayList<User> contactArrayList;
+    public static ArrayList<User> contactArrayList;
     private RecyclerView userRecyclerView;
     public static UserAdapter userAdapter;
     private RecyclerView.LayoutManager userLayoutManager;
@@ -106,6 +112,7 @@ public class UserListActivity extends AppCompatActivity {
         // checkUnreadMessages();
         buildRecyclerView();
         attachUserDatabaseReferenceListener();
+
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,6 +234,28 @@ public class UserListActivity extends AppCompatActivity {
         intent.putExtra("recipientUserName", contactArrayList.get(position).getName());
         startActivity(intent);
     }
+    public static void deleteUserContact(Integer position) {
+       // Log.d(TAG, "deleteUserContact");
+        User toDelete = contactArrayList.get(position);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        contactArrayList.remove(Integer.parseInt(position.toString()));
+        userAdapter.notifyDataSetChanged();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(auth.getCurrentUser().getUid())
+                .child("contacts");
+        String contacts="";
+        for(User user : contactArrayList){
+            if(!user.getId().equals(toDelete.getId())){
+                contacts = contacts + ":" + user.getId();
+            }
+        }
+        userRef.removeValue();
+        userRef.setValue(contacts);
+    }
+    public static void blockUserContact(Integer position){
+        User toDelete = contactArrayList.get(position);
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -323,6 +352,87 @@ public class UserListActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(UserListActivity.this, SignInActivity.class));
                 dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "OK"
+            }
+        });
+
+        // Добавляем кнопку "Cancel"
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "Cancel"
+            }
+        });
+
+        // Создаем и отображаем AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+    public static void showPopupMenu(View view,Integer position) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.contact_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.deleteContactButton:
+                        showDeleteAlertDialog(view.getContext(),position);
+                        return true;
+                    case R.id.blockContactButton:
+                        showBlockAlertDialog(view.getContext(),position);
+                        return true;
+                    case R.id.markAsUnreadContactButton:
+
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupMenu.show();
+    }
+    public static void showDeleteAlertDialog(Context context,Integer position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // Устанавливаем заголовок и сообщение для AlertDialog
+        builder.setTitle("Delete contact?");
+                // Добавляем кнопку "OK"
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteUserContact(position);
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "OK"
+                Toast.makeText(context, "Contact deleted",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Добавляем кнопку "Cancel"
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "Cancel"
+            }
+        });
+
+        // Создаем и отображаем AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+    public static void showBlockAlertDialog(Context context,Integer position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        // Устанавливаем заголовок и сообщение для AlertDialog
+        builder.setTitle("Block contact?");
+        // Добавляем кнопку "OK"
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                blockUserContact(position);
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "OK"
+                Toast.makeText(context, "Contact blocked",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 

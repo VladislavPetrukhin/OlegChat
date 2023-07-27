@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -68,6 +69,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         public CircleImageView avatarImageView;
         public TextView userNameTextView;
         public ImageView unreadDialogNotify;
+        public ImageButton contactImageButton;
 
 
         public UserViewHolder(@NonNull View itemView, OnUserClickListener listener) {
@@ -75,7 +77,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             avatarImageView = itemView.findViewById(R.id.avatarImageView);
             userNameTextView = itemView.findViewById(R.id.userNameTextView);
             unreadDialogNotify = itemView.findViewById(R.id.unreadDialogNotify);
+            contactImageButton = itemView.findViewById(R.id.contactImageButton);
 
+            contactImageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    UserListActivity.showPopupMenu(view,getAdapterPosition());
+                }
+            });
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

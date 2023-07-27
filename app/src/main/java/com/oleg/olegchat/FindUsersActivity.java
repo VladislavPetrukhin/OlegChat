@@ -202,7 +202,6 @@ public class FindUsersActivity extends AppCompatActivity {
         }
 
     }
-
     private void attachUserDatabaseReferenceListener() {
         usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
         if(usersChildEventListener == null){
@@ -212,7 +211,6 @@ public class FindUsersActivity extends AppCompatActivity {
                     User user = snapshot.getValue(User.class);
                     Log.d(TAG,"userid: " + userId);
                     if(user!=null && !user.getId().equals(userId)){
-
                         userArrayList.add(user);
                     }
                 }
