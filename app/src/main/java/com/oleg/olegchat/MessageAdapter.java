@@ -67,7 +67,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 viewHolder.timeTextView.setVisibility(View.VISIBLE);
                 viewHolder.imageTimeTextView.setVisibility(View.GONE);
                 viewHolder.messageTextView.setText(message.getText());
-                viewHolder.timeTextView.setText(convertDate(message.getDate())[1]);
+                viewHolder.timeTextView.setText(convertDate(message.getDate()));
                 break;
             }
             case "image":{
@@ -77,7 +77,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 viewHolder.imageTimeTextView.setVisibility(View.VISIBLE);
                 Glide.with(viewHolder.photoImageView.getContext())
                         .load(message.getUrl()).into(viewHolder.photoImageView);
-                viewHolder.imageTimeTextView.setText(convertDate(message.getDate())[1]);
+                viewHolder.imageTimeTextView.setText(convertDate(message.getDate()));
                 break;
             }
             case "audio":{ // TODO
@@ -184,21 +184,44 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         popupMenu.show();
     }
-    private String[] convertDate(String dateTime){
+    private String convertDate(String dateTime){
         String date = dateTime.split("T")[0];
         String time = dateTime.split("T")[1].substring(0,5);
         int timeDif=0;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
-            int myZone = Integer.parseInt(zonedDateTime.toString().split("\\+")[1].substring(0,2));
-            int messageZone = Integer.parseInt(dateTime.split("\\+")[1].substring(0,2));
+            int myZone=0;
+            int messageZone =0;
+            if (zonedDateTime.toString().contains("+")){
+                myZone = Integer.parseInt(zonedDateTime.toString().split("\\+")[1].substring(0,2));
+            }else{
+                myZone = -(Integer.parseInt(zonedDateTime.toString().split("-")[1].substring(0,2)));
+            }
+            if(zonedDateTime.toString().contains("+")){
+                messageZone = Integer.parseInt(dateTime.split("\\+")[1].substring(0,2));
+            }else{
+                messageZone = -(Integer.parseInt(dateTime.split("-")[1].substring(0,2)));
+            }
             Log.d("DateTimeLog","myZone: "+myZone);
             Log.d("DateTimeLog","messageZone: "+messageZone);
             timeDif = myZone - messageZone;
         }
         time = String.valueOf((Integer.parseInt(time.substring(0,2))+timeDif)) + time.substring(2,5);
         Log.d("DateTimeLog","time: "+time);
-        return new String[]{date,time};
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            ZonedDateTime currentDateTime = ZonedDateTime.now(ZoneId.systemDefault());
+            if (!currentDateTime.toString().split("T")[0].equals(date)){
+                Log.d("DateTimeLog","year: "+date.substring(0,4));
+                if (currentDateTime.toString().substring(0,4).equals(date.substring(0,4))){
+                    return date.substring(5,10).replace("-",".") +" "+time;
+                }else{
+                    return date.replace("-",".") + " " + time;
+                }
+            }else{
+                return time;
+            }
+        }
+        return time;
     }
 
 }
