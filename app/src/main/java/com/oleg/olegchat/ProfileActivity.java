@@ -175,8 +175,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
     }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -186,8 +184,6 @@ public class ProfileActivity extends AppCompatActivity {
                     child(selectedImageUri.getLastPathSegment());
 
             UploadTask uploadTask = imageReference.putFile(selectedImageUri);
-
-            uploadTask = imageReference.putFile(selectedImageUri);
 
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override

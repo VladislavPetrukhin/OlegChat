@@ -28,16 +28,11 @@ public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private static final String TAG = "SignInActivityLogs";
 
-    public static User currentUser = new User();
-
     private TextInputLayout emailEditText, passwordEditText, passwordEditText2, nameEditText;
     private TextView toggleLoginTextView;
     private Button loginSignUpButton;
 
     private boolean loginModeActive;
-
-    private DatabaseReference usersDatabaseReference;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +40,7 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        usersDatabaseReference = firebaseDatabase.getReference().child("users");
+        DatabaseReference usersDatabaseReference = firebaseDatabase.getReference().child("users");
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -64,12 +59,6 @@ public class SignInActivity extends AppCompatActivity {
         });
 
         auth = FirebaseAuth.getInstance();
-
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(SignInActivity.this, UserListActivity.class);
-            startActivity(intent);
-        }
 
         loginModeActive = true;
         toggleLoginTextView.setText("Tap to sign up");

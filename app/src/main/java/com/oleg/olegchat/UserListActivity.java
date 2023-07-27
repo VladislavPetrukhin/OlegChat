@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,6 +67,11 @@ public class UserListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_list);
         setTitle("My Contacts");
         auth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser == null){
+            Intent intent = new Intent(UserListActivity.this, SignInActivity.class);
+            startActivity(intent);
+        }
         userArrayList = new ArrayList<>();
         contactArrayList = new ArrayList<>();
         //sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
