@@ -21,7 +21,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -74,11 +76,15 @@ public class ChatActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     SharedPreferences sharedPreferences;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         auth = FirebaseAuth.getInstance();
         sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
@@ -339,25 +345,15 @@ public class ChatActivity extends AppCompatActivity {
         usersDatabaseReference.addChildEventListener(usersChildEventListener);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.chatactivity_menu,menu);
-        return true;
-    }
-
-    @Override
+        @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.go_back:
+            if (item.getItemId() == android.R.id.home) {
                 UserListActivity.userAdapter.notifyDataSetChanged();
                 startActivity(new Intent(ChatActivity.this,UserListActivity.class));
                 return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            }
+            return super.onOptionsItemSelected(item);
         }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -403,5 +399,33 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+    private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.message_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.messageCopyButton:
+
+                        return true;
+                    case R.id.messageReplyButton:
+
+                        return true;
+                    case R.id.messageDeleteButton:
+
+                        return true;
+                    case R.id.messageEditButton:
+
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupMenu.show();
     }
 }

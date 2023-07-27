@@ -65,6 +65,11 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         setTitle("My Profile");
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         auth = FirebaseAuth.getInstance();
 
         try {
@@ -293,7 +298,7 @@ public class ProfileActivity extends AppCompatActivity {
             case R.id.settingsButton:
                 //startActivity(new Intent(ProfileActivity.this, SettingsActivity.class));
                 return true;
-            case R.id.go_back:
+            case android.R.id.home:
                 startActivity(new Intent(ProfileActivity.this,UserListActivity.class));
                 return true;
             default:

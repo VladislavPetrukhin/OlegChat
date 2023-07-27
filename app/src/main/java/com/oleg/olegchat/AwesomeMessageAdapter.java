@@ -1,17 +1,19 @@
 package com.oleg.olegchat;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firework.imageloading.glide.GlideImageLoaderFactory;
@@ -100,6 +102,13 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
                 context.startActivity(intent);
             }
         });
+        viewHolder.messageTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopupMenu(view,awesomeMessage);
+            }
+        });
+
 
          return convertView;
     }
@@ -132,6 +141,38 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             messageTextView = view.findViewById(R.id.messageTextView);
         }
 
+    }
+    private void showPopupMenu(View view,AwesomeMessage message) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.message_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.messageCopyButton:
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("text", message.getText());
+                        clipboard.setPrimaryClip(clip);
+//                        Toast.makeText(context, "Copied",
+//                                Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.messageReplyButton:
+
+                        return true;
+                    case R.id.messageDeleteButton:
+
+                        return true;
+                    case R.id.messageEditButton:
+
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        popupMenu.show();
     }
 
 }

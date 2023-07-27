@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/messageCopyButton"
+        android:title="Copy"/>
+    <item
+        android:id="@+id/messageReplyButton"
+        android:title="Reply"/>
+    <item
+        android:id="@+id/messageDeleteButton"
+        android:title="Delete"/>
+    <item
+        android:id="@+id/messageEditButton"
+        android:title="Edit"/>
+</menu>

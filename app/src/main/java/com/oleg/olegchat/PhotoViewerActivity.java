@@ -28,6 +28,11 @@ public class PhotoViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_viewer);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         photoView = findViewById(R.id.photoView);
         Intent intent = getIntent();
         if (intent != null){
@@ -59,8 +64,8 @@ public class PhotoViewerActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.go_back:
-                UserListActivity.userAdapter.notifyDataSetChanged();
+            case android.R.id.home:
+               // ChatActivity.adapter.notifyDataSetChanged();
                 startActivity(new Intent(PhotoViewerActivity.this,ChatActivity.class));
                 return true;
             case R.id.download:

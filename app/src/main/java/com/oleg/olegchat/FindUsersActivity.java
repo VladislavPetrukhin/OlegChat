@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,11 @@ public class FindUsersActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_users);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         Intent intent = getIntent();
         username = intent.getStringExtra("userName");
@@ -134,7 +140,7 @@ public class FindUsersActivity extends AppCompatActivity {
                             userRef.setValue(contacts);
                             Toast.makeText(FindUsersActivity.this, "The user added to your contacts",
                                     Toast.LENGTH_SHORT).show();
-
+                            addToFoundedUserContact(addUserId,userId);
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
@@ -145,6 +151,49 @@ public class FindUsersActivity extends AppCompatActivity {
                     });
 
           //  UserListActivity.userArrayList.add();
+
+        } catch (Exception e) {
+            Toast.makeText(FindUsersActivity.this, "The user wasn't added to your contacts",
+                    Toast.LENGTH_SHORT).show();
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void addToFoundedUserContact(String userId, String addUserId){
+        try {
+            DatabaseReference userRef = FirebaseDatabase.getInstance()
+                    .getReference("users").child(userId).child("contacts");
+
+            userRef.addListenerForSingleValueEvent
+                    (new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            // Получение значения ветви из снимка (DataSnapshot)
+                            String contacts = dataSnapshot.getValue(String.class);
+                            Log.d(TAG, "contacts: " + contacts);
+                            if(contacts != null){
+                                String[] splitContacts = contacts.split(":");
+                                for(String contact : splitContacts){
+                                    if (contact.equals(addUserId)){
+                                        return;
+                                    }
+                                }
+                                contacts = contacts + ":" + addUserId;
+                            }
+                            else{
+                                contacts = addUserId;
+                            }
+                            userRef.removeValue();
+                            userRef.setValue(contacts);
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            // Обработка ошибок при чтении данных
+                        }
+                    });
+
+            //  UserListActivity.userArrayList.add();
 
         } catch (Exception e) {
             Toast.makeText(FindUsersActivity.this, "The user wasn't added to your contacts",
@@ -192,5 +241,14 @@ public class FindUsersActivity extends AppCompatActivity {
             usersDatabaseReference.addChildEventListener(usersChildEventListener);
 
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            UserListActivity.userAdapter.notifyDataSetChanged();
+            startActivity(new Intent(FindUsersActivity.this,UserListActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
