@@ -65,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     private String username = "Default User";
 
     private static final int RC_IMAGE_PICKER = 123;
+    private String addingfiletype;
 
 
     private FirebaseAuth auth;
@@ -212,6 +213,7 @@ public class ChatActivity extends AppCompatActivity {
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
                 sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
                 isVisibleAttachLinearLayout = false;
+                addingfiletype = "image";
             }
         });
         videoAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -225,6 +227,7 @@ public class ChatActivity extends AppCompatActivity {
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
                 sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
                 isVisibleAttachLinearLayout = false;
+                addingfiletype = "video";
             }
         });
         audioAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -238,6 +241,7 @@ public class ChatActivity extends AppCompatActivity {
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
                 sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
                 isVisibleAttachLinearLayout = false;
+                addingfiletype = "audio";
             }
         });
         documentAttachButton.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +261,7 @@ public class ChatActivity extends AppCompatActivity {
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
                 sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
                 isVisibleAttachLinearLayout = false;
+                addingfiletype = "document";
             }
         });
 
@@ -396,7 +401,7 @@ public class ChatActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         Message message = new Message();
-                        message.setMessageType("image");
+                        message.setMessageType(addingfiletype);
                         message.setMessage_id(UUID.randomUUID().toString());
                         message.setUrl(downloadUri.toString());
                         message.setName(username);
@@ -420,37 +425,13 @@ public class ChatActivity extends AppCompatActivity {
             progressBar.setVisibility(ProgressBar.INVISIBLE);
         }
     }
+    public void deleteMessage(){
+        DatabaseReference messagesDatabaseReference = firebaseDatabase.getReference().child("messages");
+
+    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private ZonedDateTime getTime(){
             ZonedDateTime currentDateTime = ZonedDateTime.now(ZoneId.systemDefault());
             return currentDateTime;
-    }
-    private void showPopupMenu(View view) {
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.getMenuInflater().inflate(R.menu.message_menu, popupMenu.getMenu());
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.messageCopyButton:
-
-                        return true;
-                    case R.id.messageReplyButton:
-
-                        return true;
-                    case R.id.messageDeleteButton:
-
-                        return true;
-                    case R.id.messageEditButton:
-
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        });
-
-        popupMenu.show();
     }
 }

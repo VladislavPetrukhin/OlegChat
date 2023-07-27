@@ -5,14 +5,17 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -66,6 +69,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 viewHolder.photoImageView.setVisibility(View.GONE);
                 viewHolder.timeTextView.setVisibility(View.VISIBLE);
                 viewHolder.imageTimeTextView.setVisibility(View.GONE);
+                viewHolder.videoView.setVisibility(View.GONE);
+                viewHolder.videoTimeTextView.setVisibility(View.GONE);
                 viewHolder.messageTextView.setText(message.getText());
                 viewHolder.timeTextView.setText(convertDate(message.getDate()));
                 break;
@@ -75,6 +80,8 @@ public class MessageAdapter extends ArrayAdapter<Message> {
                 viewHolder.photoImageView.setVisibility(View.VISIBLE);
                 viewHolder.timeTextView.setVisibility(View.GONE);
                 viewHolder.imageTimeTextView.setVisibility(View.VISIBLE);
+                viewHolder.videoView.setVisibility(View.GONE);
+                viewHolder.videoTimeTextView.setVisibility(View.GONE);
                 Glide.with(viewHolder.photoImageView.getContext())
                         .load(message.getUrl()).into(viewHolder.photoImageView);
                 viewHolder.imageTimeTextView.setText(convertDate(message.getDate()));
@@ -83,7 +90,29 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             case "audio":{ // TODO
                 break;
             }
-            case "video":{// TODO
+            case "video":{
+                viewHolder.messageTextView.setVisibility(View.GONE);
+                viewHolder.photoImageView.setVisibility(View.GONE);
+                viewHolder.timeTextView.setVisibility(View.GONE);
+                viewHolder.imageTimeTextView.setVisibility(View.GONE);
+                viewHolder.videoView.setVisibility(View.VISIBLE);
+                viewHolder.videoTimeTextView.setVisibility(View.VISIBLE);
+                viewHolder.videoView.setVideoURI(Uri.parse(message.getUrl()));
+                MediaController mediaController = new MediaController(context);
+                mediaController.setAnchorView(viewHolder.videoView);
+                viewHolder.videoView.setMediaController(mediaController);
+                viewHolder.videoTimeTextView.setText(convertDate(message.getDate()));
+                viewHolder.videoView.start();
+                viewHolder.videoView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(viewHolder.videoPlay){
+                            viewHolder.videoView.pause();
+                        }else{
+                            viewHolder.videoView.start();
+                        }
+                    }
+                });
                 break;
             }
             case "voice":{// TODO
@@ -138,17 +167,21 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
     private class ViewHolder{
 
-        private TextView messageTextView;
-      //  private PhotoView photoImageView;
+      private TextView messageTextView;
       private PhotoView photoImageView;
       private TextView timeTextView;
       private TextView imageTimeTextView;
+      private TextView videoTimeTextView;
+      private VideoView videoView;
+      private Boolean videoPlay=false;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
             messageTextView = view.findViewById(R.id.messageTextView);
             timeTextView = view.findViewById(R.id.messageTimeTextView);
             imageTimeTextView = view.findViewById(R.id.imageTimeTextView);
+            videoView = view.findViewById(R.id.videoView);
+            videoTimeTextView = view.findViewById(R.id.videoTimeTextView);
         }
 
     }

@@ -5,9 +5,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -168,8 +170,7 @@ public class ProfileActivity extends AppCompatActivity {
         logOutProfileTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(ProfileActivity.this,SignInActivity.class));
+                showAlertDialog();
             }
         });
 
@@ -305,5 +306,32 @@ public class ProfileActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
+        // Устанавливаем заголовок и сообщение для AlertDialog
+        builder.setTitle("Log out?");
+
+        // Добавляем кнопку "OK"
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(ProfileActivity.this,SignInActivity.class));
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "OK"
+            }
+        });
+
+        // Добавляем кнопку "Cancel"
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "Cancel"
+            }
+        });
+
+        // Создаем и отображаем AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -234,8 +236,7 @@ public class UserListActivity extends AppCompatActivity {
                 startActivity(new Intent(UserListActivity.this, ProfileActivity.class));
                 return true;
             case R.id.log_out:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(UserListActivity.this, SignInActivity.class));
+                showAlertDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -302,5 +303,33 @@ public class UserListActivity extends AppCompatActivity {
         };
         messagesDatabaseReference.addChildEventListener(messagesChildEventListener);
 
+    }
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Устанавливаем заголовок и сообщение для AlertDialog
+        builder.setTitle("Log out?");
+
+        // Добавляем кнопку "OK"
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(UserListActivity.this, SignInActivity.class));
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "OK"
+            }
+        });
+
+        // Добавляем кнопку "Cancel"
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Закрываем диалоговое окно после нажатия кнопки "Cancel"
+            }
+        });
+
+        // Создаем и отображаем AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }
