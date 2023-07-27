@@ -2,28 +2,29 @@ package com.oleg.olegchat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.ScrollView;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,6 +39,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,12 +51,13 @@ public class ChatActivity extends AppCompatActivity {
 
 
     private ListView messageListView;
-    private AwesomeMessageAdapter adapter;
+    private MessageAdapter adapter;
     private ProgressBar progressBar;
     private ImageButton sendFilesButton, imageAttachButton, videoAttachButton, audioAttachButton, documentAttachButton,sendMessageButton;
     private EditText messageEditText;
     private LinearLayout attachLinearLayout;
     private boolean isVisibleAttachLinearLayout;
+    private ScrollView scrollView;
 
     private String recipientUserId;
     private String recipientUserName;
@@ -112,11 +116,10 @@ public class ChatActivity extends AppCompatActivity {
         chatImagesStorageReference = storage.getReference().child("chat_images");
 
 
-        List<AwesomeMessage> awesomeMessages = new ArrayList<>();
-        adapter = new AwesomeMessageAdapter(this, R.layout.message_item, awesomeMessages);
+        List<Message> messages = new ArrayList<>();
+        adapter = new MessageAdapter(this, R.layout.message_item, messages);
         messageListView = findViewById(R.id.messageListView);
         messageListView.setAdapter(adapter);
-
 
         progressBar = findViewById(R.id.progressBar);
         sendFilesButton = findViewById(R.id.sendFilesButton);
@@ -160,7 +163,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                AwesomeMessage message = new AwesomeMessage();
+                Message message = new Message();
                 message.setMessageType("text");
                 message.setMessage_id(UUID.randomUUID().toString());
                 message.setText(messageEditText.getText().toString());
@@ -168,6 +171,12 @@ public class ChatActivity extends AppCompatActivity {
                 message.setSender(auth.getCurrentUser().getUid());
                 message.setRecipient(recipientUserId);
                 message.setUrl(null);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    ZonedDateTime zonedDateTime = getTime();
+                    message.setDate(zonedDateTime.toString());
+                }else{
+                    message.setDate(null);
+                }
                 messagesDatabaseReference.push().setValue(message);
 
                 messageEditText.setText("");
@@ -254,7 +263,7 @@ public class ChatActivity extends AppCompatActivity {
         messagesChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                AwesomeMessage message = snapshot.getValue(AwesomeMessage.class);
+                Message message = snapshot.getValue(Message.class);
 
                 if((message.getSender().equals(auth.getCurrentUser().getUid())
                         && message.getRecipient().equals(recipientUserId)) ||
@@ -270,6 +279,8 @@ public class ChatActivity extends AppCompatActivity {
                     editor.remove(message.getSender());
                     editor.putString(message.getSender(),message.getMessage_id());
                     editor.apply();
+
+
 
                     for (User user : UserAdapter.users){
                        if(user.getId().equals(message.getSender())){
@@ -287,6 +298,7 @@ public class ChatActivity extends AppCompatActivity {
                        }
                     }
                 UserListActivity.userAdapter.notifyDataSetChanged();
+                messageListView.smoothScrollToPosition(adapter.getCount() - 1);
                 }
             }
 
@@ -383,13 +395,19 @@ public class ChatActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        AwesomeMessage message = new AwesomeMessage();
+                        Message message = new Message();
                         message.setMessageType("image");
                         message.setMessage_id(UUID.randomUUID().toString());
                         message.setUrl(downloadUri.toString());
                         message.setName(username);
                         message.setSender(auth.getCurrentUser().getUid());
                         message.setRecipient(recipientUserId);
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            ZonedDateTime zonedDateTime = getTime();
+                            message.setDate(zonedDateTime.toString());
+                        }else{
+                            message.setDate(null);
+                        }
                         messagesDatabaseReference.push().setValue(message);
                         progressBar.setVisibility(ProgressBar.INVISIBLE);
                     } else {
@@ -398,7 +416,14 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
             });
+        }else{
+            progressBar.setVisibility(ProgressBar.INVISIBLE);
         }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private ZonedDateTime getTime(){
+            ZonedDateTime currentDateTime = ZonedDateTime.now(ZoneId.systemDefault());
+            return currentDateTime;
     }
     private void showPopupMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view);

@@ -5,31 +5,31 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.firework.imageloading.glide.GlideImageLoaderFactory;
 import com.github.chrisbanes.photoview.PhotoView;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 
 
-public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
+public class MessageAdapter extends ArrayAdapter<Message> {
 
-    private List<AwesomeMessage> messages;
+    private List<Message> messages;
     private Activity activity;
     private Context context;
 
-    public AwesomeMessageAdapter(Activity context, int resource, List<AwesomeMessage> messages) {
+    public MessageAdapter(Activity context, int resource, List<Message> messages) {
         super(context, resource, messages);
         this.messages = messages;
         this.context = context;
@@ -43,7 +43,7 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
         LayoutInflater layoutInflater =
                 (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        AwesomeMessage awesomeMessage = getItem(position);
+        Message message = getItem(position);
         int layoutResource = 0;
         int viewType = getItemViewType(position);
 
@@ -60,18 +60,24 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         }
-        switch (awesomeMessage.getMessageType()){
+        switch (message.getMessageType()){
             case "text":{
                 viewHolder.messageTextView.setVisibility(View.VISIBLE);
                 viewHolder.photoImageView.setVisibility(View.GONE);
-                viewHolder.messageTextView.setText(awesomeMessage.getText());
+                viewHolder.timeTextView.setVisibility(View.VISIBLE);
+                viewHolder.imageTimeTextView.setVisibility(View.GONE);
+                viewHolder.messageTextView.setText(message.getText());
+                viewHolder.timeTextView.setText(convertDate(message.getDate())[1]);
                 break;
             }
             case "image":{
                 viewHolder.messageTextView.setVisibility(View.GONE);
                 viewHolder.photoImageView.setVisibility(View.VISIBLE);
+                viewHolder.timeTextView.setVisibility(View.GONE);
+                viewHolder.imageTimeTextView.setVisibility(View.VISIBLE);
                 Glide.with(viewHolder.photoImageView.getContext())
-                        .load(awesomeMessage.getUrl()).into(viewHolder.photoImageView);
+                        .load(message.getUrl()).into(viewHolder.photoImageView);
+                viewHolder.imageTimeTextView.setText(convertDate(message.getDate())[1]);
                 break;
             }
             case "audio":{ // TODO
@@ -86,7 +92,7 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             default:{
                 viewHolder.messageTextView.setVisibility(View.VISIBLE);
                 viewHolder.photoImageView.setVisibility(View.GONE);
-                viewHolder.messageTextView.setText(awesomeMessage.getText());
+                viewHolder.messageTextView.setText(message.getText());
             }
         }
 
@@ -97,15 +103,15 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), PhotoViewerActivity.class);
-                intent.putExtra("image_resource", awesomeMessage.getUrl());
-                intent.putExtra("message_id",awesomeMessage.getMessage_id());
+                intent.putExtra("image_resource", message.getUrl());
+                intent.putExtra("message_id", message.getMessage_id());
                 context.startActivity(intent);
             }
         });
         viewHolder.messageTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopupMenu(view,awesomeMessage);
+                showPopupMenu(view, message);
             }
         });
 
@@ -116,8 +122,8 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
     @Override
     public int getItemViewType(int position) {
         int flag;
-        AwesomeMessage awesomeMessage = messages.get(position);
-        if (awesomeMessage.isMine()){
+        Message message = messages.get(position);
+        if (message.isMine()){
             flag = 0;
         }else{
             flag = 1;
@@ -135,14 +141,18 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
         private TextView messageTextView;
       //  private PhotoView photoImageView;
       private PhotoView photoImageView;
+      private TextView timeTextView;
+      private TextView imageTimeTextView;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
             messageTextView = view.findViewById(R.id.messageTextView);
+            timeTextView = view.findViewById(R.id.messageTimeTextView);
+            imageTimeTextView = view.findViewById(R.id.imageTimeTextView);
         }
 
     }
-    private void showPopupMenu(View view,AwesomeMessage message) {
+    private void showPopupMenu(View view, Message message) {
         PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.message_menu, popupMenu.getMenu());
 
@@ -173,6 +183,22 @@ public class AwesomeMessageAdapter extends ArrayAdapter<AwesomeMessage> {
         });
 
         popupMenu.show();
+    }
+    private String[] convertDate(String dateTime){
+        String date = dateTime.split("T")[0];
+        String time = dateTime.split("T")[1].substring(0,5);
+        int timeDif=0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
+            int myZone = Integer.parseInt(zonedDateTime.toString().split("\\+")[1].substring(0,2));
+            int messageZone = Integer.parseInt(dateTime.split("\\+")[1].substring(0,2));
+            Log.d("DateTimeLog","myZone: "+myZone);
+            Log.d("DateTimeLog","messageZone: "+messageZone);
+            timeDif = myZone - messageZone;
+        }
+        time = String.valueOf((Integer.parseInt(time.substring(0,2))+timeDif)) + time.substring(2,5);
+        Log.d("DateTimeLog","time: "+time);
+        return new String[]{date,time};
     }
 
 }

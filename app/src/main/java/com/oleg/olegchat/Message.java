@@ -1,6 +1,8 @@
 package com.oleg.olegchat;
 
-public class AwesomeMessage {
+import java.time.ZonedDateTime;
+
+public class Message {
 
     private String messageType;
     private String text;
@@ -9,13 +11,13 @@ public class AwesomeMessage {
     private String sender;
     private String recipient;
     private String message_id;
+    private String date;
     private boolean isMine;
-    public AwesomeMessage(){
+    public Message(){
 
     }
 
-    public AwesomeMessage(String messageType, String text, String name, String url, String sender,
-                          String recipient, String message_id, boolean isMine) {
+    public Message(String messageType, String text, String name, String url, String sender, String recipient, String message_id, String date, boolean isMine) {
         this.messageType = messageType;
         this.text = text;
         this.name = name;
@@ -23,6 +25,7 @@ public class AwesomeMessage {
         this.sender = sender;
         this.recipient = recipient;
         this.message_id = message_id;
+        this.date = date;
         this.isMine = isMine;
     }
 
@@ -80,6 +83,14 @@ public class AwesomeMessage {
 
     public void setMessage_id(String message_id) {
         this.message_id = message_id;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public boolean isMine() {

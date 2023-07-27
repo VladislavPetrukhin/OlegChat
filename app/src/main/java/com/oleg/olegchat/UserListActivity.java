@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -156,48 +154,6 @@ public class UserListActivity extends AppCompatActivity {
             usersDatabaseReference.addChildEventListener(usersChildEventListener);
 
     }
-    private void initAttachUserDatabaseReferenceListener(String[] contacts) {
-        Log.d(TAG, "initAttachUserDatabaseReferenceListener");
-        usersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
-        if (usersChildEventListener == null) {
-            usersChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    User user = snapshot.getValue(User.class);
-                    for(String contact : contacts){
-                        if (user.getId().equals(contact)){
-                            contactArrayList.add(user);
-                            Log.d(TAG,"added " + user.getId());
-                            userAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            };
-
-            usersDatabaseReference.addChildEventListener(usersChildEventListener);
-
-        }
-    }
     private void attachUserContacts() {
         Log.d(TAG, "attachUserContacts");
         contactArrayList.clear();
@@ -235,29 +191,6 @@ public class UserListActivity extends AppCompatActivity {
             }
         });
     }
-    private void initAttachUserContacts() {
-        Log.d(TAG, "initAttachUserContacts");
-        usersDatabaseReference = FirebaseDatabase.getInstance().getReference()
-                .child("users").child(auth.getCurrentUser().getUid())
-                .child("contacts");
-        usersDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Получение значения ветви из снимка (DataSnapshot)
-                String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "event");
-                if (value != null) {
-                    String[] contacts = value.split(":");
-                    initAttachUserDatabaseReferenceListener(contacts);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Обработка ошибок при чтении данных
-            }
-        });
-    }
 
     private void buildRecyclerView() {
         userRecyclerView = findViewById(R.id.userListRecycleView);
@@ -273,6 +206,7 @@ public class UserListActivity extends AppCompatActivity {
         userAdapter.setOnUserClickListener(new UserAdapter.OnUserClickListener() {
             @Override
             public void onUserClick(int position) {
+                Log.d(TAG,"position: "+ position);
                 goToChat(position);
             }
         });
@@ -280,8 +214,9 @@ public class UserListActivity extends AppCompatActivity {
 
     private void goToChat(int position) {
         Intent intent = new Intent(UserListActivity.this, ChatActivity.class);
-        intent.putExtra("recipientUserId", userArrayList.get(position).getId());
-        intent.putExtra("recipientUserName", userArrayList.get(position).getName());
+        Log.d(TAG,"userPosition: "+ contactArrayList.get(position).getName());
+        intent.putExtra("recipientUserId", contactArrayList.get(position).getId());
+        intent.putExtra("recipientUserName", contactArrayList.get(position).getName());
         startActivity(intent);
     }
 
@@ -315,7 +250,7 @@ public class UserListActivity extends AppCompatActivity {
         ChildEventListener messagesChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                AwesomeMessage message = snapshot.getValue(AwesomeMessage.class);
+                Message message = snapshot.getValue(Message.class);
 
                 if (message.getRecipient().equals(auth.getCurrentUser().getUid())) {
 
