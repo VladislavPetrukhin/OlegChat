@@ -7,16 +7,18 @@ public class User {
     private String id;
     private String photoUrl;
     private String contacts;
+    private String blocked;
 
     public User() {
     }
 
-    public User(String name, String email, String id, String photoUrl, String contacts) {
+    public User(String name, String email, String id, String photoUrl, String contacts, String blocked) {
         this.name = name;
         this.email = email;
         this.id = id;
         this.photoUrl = photoUrl;
         this.contacts = contacts;
+        this.blocked = blocked;
     }
 
     public String getName() {
@@ -58,5 +60,13 @@ public class User {
 
     public void setContacts(String contacts) {
         this.contacts = contacts;
+    }
+
+    public String getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(String blocked) {
+        this.blocked = blocked;
     }
 }

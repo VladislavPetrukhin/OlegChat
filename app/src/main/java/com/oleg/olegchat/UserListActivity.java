@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -51,10 +52,13 @@ public class UserListActivity extends AppCompatActivity {
     private String username = "Default User";
     private ArrayList<User> userArrayList;
     public static ArrayList<User> contactArrayList;
+    public static ArrayList<User> blockContactArrayList;
     private RecyclerView userRecyclerView;
     public static UserAdapter userAdapter;
     private RecyclerView.LayoutManager userLayoutManager;
     private FloatingActionButton floatingActionButton;
+    private TextView noContactsTextView;
+    public static Boolean isunread = false;
 
     public static ArrayList<Integer> unreadDialogsPosition = new ArrayList<>();
 
@@ -80,10 +84,12 @@ public class UserListActivity extends AppCompatActivity {
         }
         userArrayList = new ArrayList<>();
         contactArrayList = new ArrayList<>();
+        blockContactArrayList = new ArrayList<>();
         //sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
         //  editor = sharedPreferences.edit();
 
         floatingActionButton = findViewById(R.id.floatingActionButton);
+        noContactsTextView = findViewById(R.id.noContactsTextView);
 
         try {
             username = Objects.requireNonNull(auth.getCurrentUser()).getDisplayName();
@@ -109,7 +115,6 @@ public class UserListActivity extends AppCompatActivity {
 //        }
 //        userAdapter.notifyDataSetChanged();
 
-        // checkUnreadMessages();
         buildRecyclerView();
         attachUserDatabaseReferenceListener();
 
@@ -138,6 +143,7 @@ public class UserListActivity extends AppCompatActivity {
                        // userAdapter.notifyDataSetChanged();
                         attachUserContacts();
                         userAdapter.notifyDataSetChanged();
+                        checkUnreadMessages();
                     }
                 }
 
@@ -167,7 +173,6 @@ public class UserListActivity extends AppCompatActivity {
             };
 
             usersDatabaseReference.addChildEventListener(usersChildEventListener);
-
     }
     private void attachUserContacts() {
         Log.d(TAG, "attachUserContacts");
@@ -180,11 +185,9 @@ public class UserListActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Получение значения ветви из снимка (DataSnapshot)
                 String value = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "event");
                 if (value != null) {
                     Log.d(TAG,"value not null");
                     String[] contacts = value.split(":");
-                    Log.d(TAG,"contact1 "+contacts[0]);
                     for(String contact : contacts){
                         for(User user : userArrayList){
                             Log.d(TAG,"user"+user.getId());
@@ -192,6 +195,46 @@ public class UserListActivity extends AppCompatActivity {
                             if(user.getId().equals(contact)){
                                 if(!contactArrayList.contains(user)){
                                     contactArrayList.add(user);
+                                    userAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                    }
+                    if(contactArrayList.isEmpty()){
+                        noContactsTextView.setVisibility(View.VISIBLE);
+                    }else{
+                        noContactsTextView.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Обработка ошибок при чтении данных
+            }
+        });
+    }
+    private void attachBlockUserContacts() {
+        Log.d(TAG, "attachBlockUserContacts");
+        blockContactArrayList.clear();
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(auth.getCurrentUser().getUid())
+                .child("block_contacts");
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Получение значения ветви из снимка (DataSnapshot)
+                String value = dataSnapshot.getValue(String.class);
+                if (value != null) {
+                    Log.d(TAG,"value not null");
+                    String[] blockContacts = value.split(":");
+                    for(String contact : blockContacts){
+                        for(User user : userArrayList){
+                            Log.d(TAG,"user"+user.getId());
+                            Log.d(TAG,"contact"+contact);
+                            if(user.getId().equals(contact)){
+                                if(contactArrayList.contains(user)){
+                                    blockContactArrayList.add(user);
                                     userAdapter.notifyDataSetChanged();
                                 }
                             }
@@ -232,6 +275,7 @@ public class UserListActivity extends AppCompatActivity {
         Log.d(TAG,"userPosition: "+ contactArrayList.get(position).getName());
         intent.putExtra("recipientUserId", contactArrayList.get(position).getId());
         intent.putExtra("recipientUserName", contactArrayList.get(position).getName());
+        intent.putExtra("avatarUrl", contactArrayList.get(position).getPhotoUrl());
         startActivity(intent);
     }
     public static void deleteUserContact(Integer position) {
@@ -281,6 +325,9 @@ public class UserListActivity extends AppCompatActivity {
     private void checkUnreadMessages() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference messagesDatabaseReference = firebaseDatabase.getReference().child("messages");
+        // Получаем экземпляр SharedPreferences по имени "MyPrefs"
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        final Boolean[] unread = {false,false};
 
 
         ChildEventListener messagesChildEventListener = new ChildEventListener() {
@@ -295,24 +342,32 @@ public class UserListActivity extends AppCompatActivity {
                             String lastMessage_id = "";
                             int position = userArrayList.indexOf(user);
                             try {
-                                sharedPreferences.getString(user.getId(), lastMessage_id);
-                                Log.d("lastMessage_id", "get: " + lastMessage_id);
+                               // sharedPreferences.getString(user.getId(), lastMessage_id);
+                                Log.d("lastMessage_id","userid "+user.getId());
+                                lastMessage_id = sharedPreferences.getString(user.getId(),"");
+                                Log.d("lastMessage_id", "lastMessage_id: " + lastMessage_id);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                             if (!message.getMessage_id().equals(lastMessage_id)) {
-                                unreadDialogsPosition.add(position);
-                            } else if (unreadDialogsPosition.contains(position)) {
-                                try {
-                                    unreadDialogsPosition.remove(unreadDialogsPosition.indexOf(position));
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
-
+                                unread[0] = true;
+                               // unreadDialogsPosition.add(position);
+                            } //else if (unreadDialogsPosition.contains(position)) {
+//                                try {
+//                                    unreadDialogsPosition.remove(unreadDialogsPosition.indexOf(position));
+//                                } catch (Exception e) {
+//                                    throw new RuntimeException(e);
+//                                }
+                            else{
+                                unread[0] = false;
+                                unread[1] = true;
                             }
                             userAdapter.notifyDataSetChanged();
                         }
                     }
+                }
+                if( unread[0] && unread[1]){
+                    isunread = true;
                 }
             }
 

@@ -25,7 +25,9 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -61,6 +63,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private String recipientUserId;
     private String recipientUserName;
+    private String avatarUrl;
 
     private String username = "Default User";
 
@@ -91,6 +94,12 @@ public class ChatActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true); // Показывать логотип
+        getSupportActionBar().setDisplayUseLogoEnabled(true); // Использовать логотип, если он установлен
+
+         // Замените R.drawable.your_logo на ваш логотип
+        getSupportActionBar().setLogo(R.drawable.profile_image_small);
+        getSupportActionBar().setDisplayShowTitleEnabled(true); // Скрыть заголовок, если не нужен
         auth = FirebaseAuth.getInstance();
         sharedPreferences = this.getSharedPreferences("lastMessages", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -99,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
         if(intent!=null){
             recipientUserId = intent.getStringExtra("recipientUserId");
             recipientUserName = intent.getStringExtra("recipientUserName");
+            avatarUrl = intent.getStringExtra("avatarUrl");
         }
         try {
             username = Objects.requireNonNull(auth.getCurrentUser()).getDisplayName();
@@ -107,7 +117,8 @@ public class ChatActivity extends AppCompatActivity {
         }
 
 
-        setTitle(recipientUserName);
+        getSupportActionBar().setTitle(recipientUserName);
+        //getSupportActionBar().setLogo(avatarUrl);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -281,7 +292,8 @@ public class ChatActivity extends AppCompatActivity {
                         message.setMine(false);
                     }
                     adapter.add(message);
-                    editor.remove(message.getSender());
+                    Log.d("lastMessage_id ","messageid "+message.getMessage_id());
+                    Log.d("lastMessage_id ","messagesender  "+message.getSender());
                     editor.putString(message.getSender(),message.getMessage_id());
                     editor.apply();
 
