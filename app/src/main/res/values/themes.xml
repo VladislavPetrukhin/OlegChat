@@ -2,7 +2,33 @@
     <!-- Base application theme. -->
     <style name="Theme.OlegChat" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-
         <!-- Customize your theme here. -->
+    </style>
+    <style name="userItemTheme">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="imageButtonBackground">@color/white</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:src">@drawable/baseline_more_vert_24_black</item>
+    </style>
+    <style name="MainBackgroundColor">
+        <item name="android:background">@color/white</item>
+    </style>
+    <style name="imageAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_insert_photo_24_black</item>
+    </style>
+    <style name="videoAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_video_library_24_black</item>
+    </style>
+    <style name="audioAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_headphones_24_black</item>
+    </style>
+    <style name="documentAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_insert_drive_file_24_black</item>
+    </style>
+    <style name="sendFilesButtonBackground">
+        <item name="android:background">@drawable/baseline_attach_file_24_black</item>
+    </style>
+    <style name="ChatIconBackground">
+        <item name="android:background">@drawable/baseline_chat_24_black</item>
     </style>
 </resources>

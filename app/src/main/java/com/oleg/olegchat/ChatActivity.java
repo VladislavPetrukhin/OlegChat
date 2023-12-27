@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,17 +20,13 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -145,8 +144,6 @@ public class ChatActivity extends AppCompatActivity {
 
         progressBar.setVisibility(ProgressBar.INVISIBLE);
 
-
-
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -198,12 +195,25 @@ public class ChatActivity extends AppCompatActivity {
         sendFilesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                boolean darkTheme = false;
+                if(nightModeFlags == Configuration.UI_MODE_NIGHT_YES){
+                    darkTheme = true;
+                }
                 if (isVisibleAttachLinearLayout) {
                     attachLinearLayout.animate().alpha(0).setDuration(1000);
-                    sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                    if(darkTheme){
+                        sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_white));
+                    }else{
+                        sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_black));
+                    }
                 }else{
                     attachLinearLayout.animate().alpha(1).setDuration(1000);
-                    sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_close_24));
+                    if(darkTheme){
+                        sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_close_24_white));
+                    }else{
+                        sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_close_24_black));
+                    }
                 }
                 isVisibleAttachLinearLayout = !isVisibleAttachLinearLayout;
             }
@@ -222,7 +232,7 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent,"Choose an image"),
                         RC_IMAGE_PICKER);
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
-                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_black));
                 isVisibleAttachLinearLayout = false;
                 addingfiletype = "image";
             }
@@ -236,7 +246,7 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent,"Choose an video"),
                         RC_IMAGE_PICKER);
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
-                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_black));
                 isVisibleAttachLinearLayout = false;
                 addingfiletype = "video";
             }
@@ -250,7 +260,7 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent,"Choose an audio"),
                         RC_IMAGE_PICKER);
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
-                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_black));
                 isVisibleAttachLinearLayout = false;
                 addingfiletype = "audio";
             }
@@ -270,7 +280,7 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent,"Choose an document"),
                         RC_IMAGE_PICKER);
                 attachLinearLayout.animate().alpha(0).setDuration(1000);
-                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24));
+                sendFilesButton.setBackground(getResources().getDrawable(R.drawable.baseline_attach_file_24_black));
                 isVisibleAttachLinearLayout = false;
                 addingfiletype = "document";
             }

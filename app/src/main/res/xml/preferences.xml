@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Settings of app">
+        <CheckBoxPreference
+            android:key="pref_key_notifications"
+            android:title="Notifications"
+            android:summaryOn="Notifications Enable"
+            android:summaryOff="Notifications Disable"
+            android:defaultValue="true" />
+        <ListPreference
+            android:key="pref_key_theme"
+            android:title="Theme"
+            android:summary="Choose theme of app"
+            android:entries="@array/theme_options"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="system" />
+        <ListPreference
+            android:key="pref_key_font_size"
+            android:title="Font size"
+            android:summary="Choose font size"
+            android:entries="@array/font_size_options"
+            android:entryValues="@array/font_size_values"
+            android:defaultValue="18" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -293,7 +293,7 @@ public class ProfileActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.settingsButton:
-                //startActivity(new Intent(ProfileActivity.this, SettingsActivity.class));
+                startActivity(new Intent(ProfileActivity.this, SettingsActivity.class));
                 return true;
             case android.R.id.home:
                 startActivity(new Intent(ProfileActivity.this,UserListActivity.class));

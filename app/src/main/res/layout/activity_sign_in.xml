@@ -13,7 +13,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:src="@drawable/baseline_chat_24"
+        style="@style/ChatIconBackground"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:layout_width="150dp"

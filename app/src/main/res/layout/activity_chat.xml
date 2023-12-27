@@ -35,28 +35,28 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/baseline_insert_drive_file_24"
+            style="@style/documentAttachButtonBackground"
             android:contentDescription="TODO" />
         <ImageButton
             android:id="@+id/audioAttachButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/baseline_headphones_24"
+            style="@style/audioAttachButtonBackground"
             android:contentDescription="TODO" />
         <ImageButton
             android:id="@+id/videoAttachButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/baseline_video_library_24"
+            style="@style/videoAttachButtonBackground"
             android:contentDescription="TODO" />
         <ImageButton
             android:id="@+id/imageAttachButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/baseline_insert_photo_24"
+            style="@style/imageAttachButtonBackground"
             android:contentDescription="TODO" />
     </LinearLayout>
 
@@ -73,9 +73,9 @@
 
         <ImageButton
             android:id="@+id/sendFilesButton"
+            style="@style/sendFilesButtonBackground"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/baseline_attach_file_24"
             android:contentDescription="TODO" />
 
         <EditText

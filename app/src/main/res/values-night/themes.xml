@@ -4,4 +4,31 @@
         <!-- Primary brand color. -->
         <!-- Customize your theme here. -->
     </style>
+    <style name="userItemTheme">
+        <item name="cardBackgroundColor">@color/black</item>
+        <item name="imageButtonBackground">@color/black</item>
+        <item name="android:background">@color/black</item>
+        <item name="android:src">@drawable/baseline_more_vert_24_white</item>
+    </style>
+    <style name="MainBackgroundColor">
+        <item name="android:background">@color/black</item>
+    </style>
+    <style name="imageAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_insert_photo_24_white</item>
+    </style>
+    <style name="videoAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_video_library_24_white</item>
+    </style>
+    <style name="audioAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_headphones_24_white</item>
+    </style>
+    <style name="documentAttachButtonBackground">
+        <item name="android:background">@drawable/baseline_insert_drive_file_24_white</item>
+    </style>
+    <style name="sendFilesButtonBackground">
+        <item name="android:background">@drawable/baseline_attach_file_24_white</item>
+    </style>
+    <style name="ChatIconBackground">
+        <item name="android:background">@drawable/baseline_chat_24_white</item>
+    </style>
 </resources>

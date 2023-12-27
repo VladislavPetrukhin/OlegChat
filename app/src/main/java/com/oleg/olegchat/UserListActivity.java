@@ -3,6 +3,8 @@ package com.oleg.olegchat;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -96,6 +98,30 @@ public class UserListActivity extends AppCompatActivity {
             username = Objects.requireNonNull(auth.getCurrentUser()).getDisplayName();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+
+        // Получаем экземпляр SharedPreferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Читаем значение
+        String theme = sharedPreferences.getString("pref_key_theme", "system");
+
+        switch (theme) {
+            case "system":
+                Log.d("Theme", "Theme: system");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+
+            case "light":
+                Log.d("Theme", "Theme: light");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+
+            case "dark":
+                Log.d("Theme", "Theme: dark");
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
         }
 
         //   Log.d("currentUserLog",SignInActivity.currentUser.getId());
