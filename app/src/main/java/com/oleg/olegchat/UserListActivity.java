@@ -59,6 +59,7 @@ public class UserListActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButton;
     private TextView noContactsTextView;
     public static Boolean isunread = false;
+    private Boolean isNoContacts = true;
 
     public static ArrayList<Integer> unreadDialogsPosition = new ArrayList<>();
 
@@ -177,6 +178,7 @@ public class UserListActivity extends AppCompatActivity {
     private void attachUserContacts() {
         Log.d(TAG, "attachUserContacts");
         contactArrayList.clear();
+        noContactsTextView.setVisibility(View.VISIBLE);
         databaseReference = FirebaseDatabase.getInstance().getReference()
                 .child("users").child(auth.getCurrentUser().getUid())
                 .child("contacts");
@@ -196,18 +198,13 @@ public class UserListActivity extends AppCompatActivity {
                                 if(!contactArrayList.contains(user)){
                                     contactArrayList.add(user);
                                     userAdapter.notifyDataSetChanged();
+                                    noContactsTextView.setVisibility(View.GONE);
                                 }
                             }
                         }
                     }
-                    if(contactArrayList.isEmpty()){
-                        noContactsTextView.setVisibility(View.VISIBLE);
-                    }else{
-                        noContactsTextView.setVisibility(View.GONE);
-                    }
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Обработка ошибок при чтении данных
